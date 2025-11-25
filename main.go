@@ -24,11 +24,21 @@ func parent() {
 	// Create a clone of our program
 	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, os.Args[2:]...)...)
 
-	// This clone should have a separate namespace for PID, MNT, and network for isolatio
+	// This clone should have a separate namespace for PID, MNT, and network for isolation
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS | syscall.CLONE_NEWUSER, // User NS to allow for rootless containers
 		Unshareflags: syscall.CLONE_NEWNS, // CRITICAL: Unshare the mount namespace so it doesn't share with parent
 												// This is so when we unmount our running FS, it won't impact the parent/host FS
+		Credential: &syscall.Credential{
+			Uid: 0,
+			Gid: 0,
+		},
+		UidMappings: []syscall.SysProcIDMap{ // Map our child userID to namespace
+			{ContainerID: 0, HostID: os.Getuid(), Size: 1},
+		},
+		GidMappings: []syscall.SysProcIDMap{
+			{ContainerID: 0, HostID: os.Getgid(), Size: 1},
+		},
 	}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
