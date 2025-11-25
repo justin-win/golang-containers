@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"syscall"
@@ -8,7 +9,8 @@ import (
 
 func main() {
 	if argc := len(os.Args); argc < 2 {
-		panic("./main <run/arg> <commands>")
+		fmt.Println("./main <run/arg> <commands>")
+		os.Exit(1)
 	}
 	switch os.Args[1] {
 	case "run":
@@ -16,7 +18,8 @@ func main() {
 	case "child":
 		child()
 	default:
-		panic("./main <run/arg> <commands>")
+		fmt.Println("./main <run/arg> <commands>")
+		os.Exit(1)
 	}
 }
 
