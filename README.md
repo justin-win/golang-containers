@@ -10,14 +10,16 @@ $ docker export $(docker create ubuntu:latest) | sudo tar -x -C ubuntu-fs
 
 This snippet will grab the latest image of Ubuntu from docker and extract into the directory `ubuntu-fs/`.
 
-Now you can run `go run main.go <run/child> <commands>` similar to Docker. If it cannot create a clone from `/proc/self/exe` then it you will need to compile it and run with escalated privileges
+Now you can run `make build` to compile.
 ```
-$ go build main.go
-$ sudo ./main <run/child> <commands>
+$ make build
+Building gopod...
+go build -o bin/gopod .
+$ <sudo> bin/gopod <run> <commands>
 ```
 For example
 ```
-$ sudo ./main run /bin/bash
+$ bin/gopod run /bin/bash
 root@container:/#
 root@container:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
